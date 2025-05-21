@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?php
 
 /**
@@ -36,11 +37,14 @@ $tomorrow = strtotime("tomorrow");*/
 //$facilities = $db->find("athletic_facilities", array("order"=>"name"));
 ?>
 
+=======
+>>>>>>> e091834358ada1c3c1f438282030179bbe22c213
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
     <title>Juniata College Chemical Order Form</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -51,10 +55,25 @@ $tomorrow = strtotime("tomorrow");*/
             width: 100%;
             padding: 2px;
             margin: 0;
+=======
+    <title>Juniata College Gym Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <style>
+        body {
+            padding-top: 56px; /* Padding to ensure content isn't overlapped by fixed navbar */
+        }
+        footer {
+            background-color: #f5f5f5;
+            padding: 20px 0;
+>>>>>>> e091834358ada1c3c1f438282030179bbe22c213
         }
     </style>
 </head>
 <body>
+<<<<<<< HEAD
 
     
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
@@ -67,6 +86,29 @@ $tomorrow = strtotime("tomorrow");*/
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link active" href="index.html">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="admin.html">Admin</a></li>
+=======
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="https://www.juniata.edu/">Juniata College</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="https://services2.juniata.edu/cts/sandbox/chemicals.html">Home</a>
+                </li>
+<!--                 <li class="nav-item">
+                    <a class="nav-link" href="#" id="load-15min">15 Minute Increments</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="load-30min">Half-Hour Increments</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="load-hourly">Hourly Increments</a>
+                </li> -->
+>>>>>>> e091834358ada1c3c1f438282030179bbe22c213
             </ul>
         </div>
     </div>
@@ -74,6 +116,7 @@ $tomorrow = strtotime("tomorrow");*/
 
 
 <div class="container mt-5">
+<<<<<<< HEAD
     <h2 class="mb-4">Chemical Order Form</h2>
     <form action="submit_order.php" method="POST">
         <!-- Vendor Information Section -->
@@ -293,3 +336,65 @@ $tomorrow = strtotime("tomorrow");*/
 </script>
 </body>
 </html>
+=======
+        <h2 class="mb-4">Chemical Order Form</h2>
+        <form action="submit_order.php" method="POST">
+            <div class="mb-3">
+                <label for="chemical" class="form-label">Chemical Name</label>
+                <input type="text" class="form-control" id="chemical" name="chemical" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="quantity" class="form-label">Quantity</label>
+                <input type="number" class="form-control" id="quantity" name="quantity" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="requester" class="form-label">Requester Name</label>
+                <input type="text" class="form-control" id="requester" name="requester" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit Order</button>
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-auto py-3">
+        <div class="container text-center">
+            <span class="text-muted"></span>
+            <div>
+                <p>&copy; Juniata College 20<?php $year = date("y"); echo $year;?></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap core JavaScript and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+
+    <script type="text/javascript">
+        
+        $(document).ready(function() {
+    // Load 15-minute dashboard
+    $('#load-15min').click(function(e) {
+        e.preventDefault(); // Prevent default anchor click behavior
+        $('#dashboard-content').load('dashboard-15-minute.html');
+    });
+
+    // Load half-hour dashboard
+    $('#load-30min').click(function(e) {
+        e.preventDefault();
+        $('#dashboard-content').load('dashboard-half-hour.html');
+    });
+
+    // Load hourly dashboard
+    $('#load-hourly').click(function(e) {
+        e.preventDefault();
+        $('#dashboard-content').load('dashboard-hourly.html');
+    });
+});
+
+    </script>
+</body>
+</html>
+>>>>>>> e091834358ada1c3c1f438282030179bbe22c213
