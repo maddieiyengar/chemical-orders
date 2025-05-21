@@ -1,0 +1,295 @@
+<?php
+
+/**
+ * Created by Adam Steele.
+ * User: steelea
+ * Date: 5/16/24
+ * Time: 9:01 AM
+ */
+
+include("includes/functions.php");
+// limit to admins
+
+require_once('/Volumes/FilesVolume/web/phpadmin/webdev_classes/Authenticate.php');
+require_once('/Volumes/FilesVolume/web/phpadmin/webdev_classes/UserHandler.php');
+
+$username = UserHandler::ensure_level(308,array(USER_REGULAR,USER_ADMIN,USER_SUPER),'Access Denied','https://www.juniata.edu/');
+
+$ADMIN = UserHandler::has_access($username,308,USER_ADMIN);
+$SUPER = UserHandler::has_access($username,308,USER_SUPER);
+$REG = UserHandler::has_access($username,308,USER_REGULAR);
+// Get settings
+//$instructorNumber = get_InstructorNumber($username);
+
+/*
+var_dump($username);
+var_dump($ADMIN);
+var_dump($SUPER);
+var_dump($REG);
+exit();
+*/
+
+/*$now = time();
+$nowish = $now - (60*60);
+$tomorrow = strtotime("tomorrow");*/
+
+//$facilities = $db->find("athletic_facilities", array("order"=>"name"));
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juniata College Chemical Order Form</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding-top: 56px; }
+        footer { background-color: #f5f5f5; padding: 20px 0; }
+        .table-chemical-order input, .table-chemical-order select {
+            width: 100%;
+            padding: 2px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="juniata.edu">Juniata College</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link active" href="index.html">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="admin.html">Admin</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<div class="container mt-5">
+    <h2 class="mb-4">Chemical Order Form</h2>
+    <form action="submit_order.php" method="POST">
+        <!-- Vendor Information Section -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h4 mb-0">Vendor Information</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="vendor" class="form-label">Vendor</label>
+                        <select class="form-select" id="vendor" name="vendor">
+                            <option value="">Choose an item</option>
+                            <option value="Acros/Fisher">Acros/Fisher</option>
+                            <option value="Sigma-Aldrich">Sigma Aldrich</option>
+                            <option value="TCI">TCI</option>
+                            <option value="Thomas">Thomas</option>
+                            <option value="VWR">VWR</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <h3 class="h5 mb-3">If Other, please provide the following:</h3>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="vendorName" class="form-label">Vendor Name</label>
+                            <input type="text" class="form-control" id="vendorName" name="vendorName" 
+                                   placeholder="Enter vendor name">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="vendorAddress" class="form-label">Vendor Mailing Address</label>
+                            <input type="text" class="form-control" id="vendorAddress" name="vendorAddress" 
+                                   placeholder="Enter vendor mailing address">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="vendorPhone" class="form-label">Vendor Phone Number</label>
+                            <input type="tel" class="form-control" id="vendorPhone" name="vendorPhone" 
+                                   placeholder="Enter vendor phone number">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chemical Order Details Section -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h2 class="h4 mb-0">Chemical Order Details</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-chemical-order">
+                        <thead>
+                            <tr>
+                                <th>Catalog #</th>
+                                <th>Quantity</th>
+                                <th>Description</th>
+                                <th>Size</th>
+                                <th>Amount Needed</th>
+                                <th>Hazards (SDS Section 2)</th>
+                                <th>Price</th>
+                                <th>Storage Room/Letter</th>
+                                <th>Website Link</th>
+                            </tr>
+                        </thead>
+                        <tbody id="chemicalOrderRows">
+                            <tr>
+                                <td><input type="text" name="catalogNumber[]"></td>
+                                <td><input type="number" name="quantity[]"></td>
+                                <td><input type="text" name="description[]"></td>
+                                <td><input type="text" name="size[]"></td>
+                                <td><input type="text" name="amountNeeded[]"></td>
+                                <td><input type="text" name="hazards[]"></td>
+                                <td><input type="number" step="0.01" name="price[]"></td>
+                                <td><input type="text" name="storageRoom[]"></td>
+                                <td><input type="url" name="websiteLink[]"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button type="button" id="addRowBtn" class="btn btn-secondary mb-3">Add Another Chemical</button>
+                </div>
+
+                <!-- RCRA P-listed Waste -->
+                <div class="mb-3">
+                    <label for="pListedWaste" class="form-label">RCRA P-listed Waste Chemicals</label>
+                    <input type="text" class="form-control" id="pListedWaste" name="pListedWaste" 
+                           placeholder="List any RCRA P-listed waste chemicals">
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Order Information -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h2 class="h4 mb-0">Order and Shipping Details</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="account" class="form-label">Account</label>
+                        <input type="text" class="form-control" id="account" name="account">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="budgetLine" class="form-label">Budget Line</label>
+                        <select class="form-select" id="budgetLine" name="budgetLine">
+                            <option value="">Choose an item</option>
+                            <option value="6100 Chemicals">6100 Chemicals</option>
+                            <option value="6200 Chemicals (Course Fee)">6200 Chemicals (Course Fee)</option>
+                            <option value="6117 Materials">6117 Materials</option>
+                            <option value="6217 Materials (Course Fee)">6217 Materials (Course Fee)</option>
+                            <option value="6140 Equipment">6140 Equipment</option>
+                            <option value="6154 Gasses & Cryogens">6154 Gasses & Cryogens</option>
+                            <option value="6130 Computers & Software">6130 Computers & Software</option>
+                            <option value="6157 Vineyard">6157 Vineyard</option>
+                            <option value="6119 Temporary Charges">6119 Temporary Charges</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="labStorage" class="form-label">Lab to be Stored In</label>
+                        <input type="text" class="form-control" id="labStorage" name="labStorage">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="dateRequested" class="form-label">Date Requested</label>
+                        <input type="date" class="form-control" id="dateRequested" name="dateRequested">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Can Order Wait for Shipping?</label>
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="shippingWait" id="shippingWaitYes" value="yes">
+                                <label class="form-check-label" for="shippingWaitYes">Yes</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="shippingWait" id="shippingWaitNo" value="no">
+                                <label class="form-check-label" for="shippingWaitNo">No</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="requestedBy" class="form-label">Requested By</label>
+                        <input type="text" class="form-control" id="requestedBy" name="requestedBy">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="requestorEmail" class="form-label">Requestor Email</label>
+                        <input type="email" class="form-control" id="requestorEmail" name="requestorEmail">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="shipToPerson" class="form-label">Ship to Person</label>
+                        <input type="text" class="form-control" id="shipToPerson" name="shipToPerson">
+                    </div>
+                </div>
+
+                <!-- Signatures Section -->
+                <div class="row g-3 mt-3">
+                    <div class="col-md-6">
+                        <label for="requestorSignature" class="form-label">Electronic Signature of Requestor</label>
+                        <input type="text" class="form-control" id="requestorSignature" name="requestorSignature">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="deptChairSignature" class="form-label">Approval of Dept. Chair</label>
+                        <select class="form-select" id="deptChairSignature" name="deptChairSignature">
+                            <option value="" selected disabled>Select Department Chair</option>
+                            <option value="Dr. Randy Bennett">Dr. Randy Bennett</option>
+                            <option value="Dr. Ursula Williams">Dr. Ursula Williams</option>
+                            <option value="Dr. Denny Johnson">Dr. Denny Johnson</option>
+                            <option value="Dr. Uma Ramakrishnan">Dr. Uma Ramakrishnan</option>
+                            <option value="Dr. Ryan Mathur">Dr. Ryan Mathur</option>
+                            <option value="Dr. Jim Borgardt">Dr. Jim Borgardt</option>
+                            <option value="Dr. Kimberly Roth">Dr. Kimberly Roth</option>
+                            <option value="Dr. Loren Rhodes">Dr. Loren Rhodes</option>
+                            <option value="Dr. Kathy Westcott">Dr.  Kathy Westcott</option>
+                            <option value="Dr. Alison Fletcher">Dr. Alison Fletcher</option>
+                            <option value="Test">Test</option>
+                        </select>
+                        <label for="deptChairDate" class="form-label mt-2">Date</label>
+                        <input type="date" class="form-control" id="deptChairDate" name="deptChairDate">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit Chemical Order</button>
+    </form>
+</div>
+
+<footer class="footer mt-auto py-3">
+    <div class="container text-center">
+        <p>&copy; Juniata College <?php echo date("Y"); ?></p>
+    </div>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    
+    $(document).ready(function() {
+    // Show/hide vendor details when 'Other' is selected
+    $('#vendor').change(function() {
+        if ($(this).val() === 'Other') {
+            $('#vendorOtherSection').show();
+            // Make vendor details required when 'Other' is selected
+            $('#vendorName, #vendorAddress, #vendorPhone').prop('required', true);
+        } else {
+            $('#vendorOtherSection').hide();
+            // Remove required attribute for other vendor types
+            $('#vendorName, #vendorAddress, #vendorPhone').prop('required', false);
+        }
+    });
+
+    // Add new row to chemical order table
+    $('#addRowBtn').click(function() {
+        var newRow = $('#chemicalOrderRows tr:first').clone();
+        newRow.find('input').val('');
+        $('#chemicalOrderRows').append(newRow);
+    });
+});
+</script>
+</body>
+</html>

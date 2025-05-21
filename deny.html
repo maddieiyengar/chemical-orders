@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Denied - Chemical Order System</title>
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { 
+            padding-top: 56px; 
+            background-color: #f4f6f9;
+        }
+        .confirmation-card {
+            max-width: 600px;
+            margin: 100px auto;
+        }
+        .x-circle {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            display: inline-block;
+            border-radius: 50%;
+            background-color: #dc3545;
+            margin-bottom: 20px;
+        }
+        .x-mark {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+        }
+        .x-mark:before, .x-mark:after {
+            position: absolute;
+            content: '';
+            width: 100%;
+            height: 4px;
+            background-color: white;
+            top: 18px;
+        }
+        .x-mark:before {
+            transform: rotate(45deg);
+        }
+        .x-mark:after {
+            transform: rotate(-45deg);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="https://www.juniata.edu">Juniata College</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.php">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="admin.php">Admin</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="confirmation-card card shadow-sm">
+            <div class="card-body text-center p-5">
+                <div class="x-circle">
+                    <div class="x-mark"></div>
+                </div>
+                <h2 class="mb-4">Request Denied!</h2>
+                <p class="lead mb-4">The chemical order has been denied.</p>
+                <p class="mb-4">An email notification has been sent to the requestor.</p>
+                <a href="admin.php" class="btn btn-primary">Go Back to Admin</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5.3 JS and Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get order ID from URL parameter to display in case needed
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderID = urlParams.get('orderID'); // Fixed variable name to match PHP variable
+            
+            if (orderID) {
+                document.querySelector('.lead').textContent = `Chemical order #${orderID} has been denied.`;
+            }
+        });
+    </script>
+</body>
+</html>

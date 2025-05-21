@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemical Order Details</title>
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { 
+            padding-top: 56px; 
+            background-color: #f4f6f9;
+        }
+        .status-badge {
+            font-size: 0.8em;
+            padding: 0.35em 0.65em;
+        }
+        .section-header {
+            background-color: #e9ecef;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .info-value {
+            color: #212529;
+        }
+        .signature-box {
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+        }
+        .hazard-tag {
+            display: inline-block;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="juniata.edu">Juniata College</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="admin.html">Admin</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12 mb-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="admin.html">Admin Dashboard</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Order Details</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h3 class="h5 mb-0">Order #<span id="orderIdDisplay">...</span></h3>
+                        <span class="badge" id="statusBadge">Loading...</span>
+                    </div>
+                    <div class="card-body" id="orderLoading">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Loading order details...</p>
+                        </div>
+                    </div>
+                    <div class="card-body" id="orderDetails" style="display: none;">
+                        <div class="row">
+                            <!-- Order Information -->
+                            <div class="col-md-6">
+                                <div class="section-header">Order Information</div>
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Order Date:</div>
+                                    <div class="col-md-7 info-value" id="dateRequested"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Requested By:</div>
+                                    <div class="col-md-7 info-value" id="requestedBy"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Requestor Email:</div>
+                                    <div class="col-md-7 info-value" id="requestorEmail"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Employee ID:</div>
+                                    <div class="col-md-7 info-value" id="employeeID"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Ship To:</div>
+                                    <div class="col-md-7 info-value" id="shipToPerson"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Account/Budget:</div>
+                                    <div class="col-md-7 info-value"><span id="account"></span> / <span id="budgetLine"></span></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Shipping Wait:</div>
+                                    <div class="col-md-7 info-value" id="shippingWait"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Vendor Information -->
+                            <div class="col-md-6">
+                                <div class="section-header">Vendor Information</div>
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Vendor:</div>
+                                    <div class="col-md-7 info-value" id="vendor"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Vendor Name:</div>
+                                    <div class="col-md-7 info-value" id="vendorName"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Address:</div>
+                                    <div class="col-md-7 info-value" id="vendorAddress"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Phone:</div>
+                                    <div class="col-md-7 info-value" id="vendorPhone"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Website:</div>
+                                    <div class="col-md-7 info-value">
+                                        <a href="#" id="websiteLink" target="_blank">View Website</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Product Information -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="section-header">Product Information</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Description:</div>
+                                    <div class="col-md-7 info-value" id="description"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Catalog Number:</div>
+                                    <div class="col-md-7 info-value" id="catalogNumber"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Size:</div>
+                                    <div class="col-md-7 info-value" id="size"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Quantity:</div>
+                                    <div class="col-md-7 info-value" id="quantity"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Amount Needed:</div>
+                                    <div class="col-md-7 info-value" id="amountNeeded"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Price:</div>
+                                    <div class="col-md-7 info-value" id="price"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Hazards:</div>
+                                    <div class="col-md-7 info-value" id="hazards"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">P-Listed Waste:</div>
+                                    <div class="col-md-7 info-value" id="pListedWaste"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Storage Room:</div>
+                                    <div class="col-md-7 info-value" id="storageRoom"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Lab Storage:</div>
+                                    <div class="col-md-7 info-value" id="labStorage"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Approval Information -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="section-header">Approval Information</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Requestor Signature:</div>
+                                    <div class="col-md-7">
+                                        <div class="signature-box" id="requestorSignature">Not signed</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Department Chair:</div>
+                                    <div class="col-md-7">
+                                        <div class="signature-box" id="deptChairSignature">Not signed</div>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-5 info-label">Chair Approval Date:</div>
+                                    <div class="col-md-7 info-value" id="deptChairDate"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a href="admin.html" class="btn btn-secondary btn-sm">Back to List</a>
+                                    <div id="actionButtons">
+                                        <button type="button" class="btn btn-success" id="approveBtn">Approve Order</button>
+                                        <button type="button" class="btn btn-danger ms-2" id="rejectBtn">Reject Order</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error message area -->
+        <div class="alert alert-danger" id="errorMessage" style="display: none;"></div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationTitle">Confirm Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="confirmationMessage">
+                    Are you sure you want to proceed with this action?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmAction">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5.3 JS and Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+    
+    <script>
+ document.addEventListener('DOMContentLoaded', function() {
+    // Get order ID from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get('orderId');
+    
+    if (!orderId) {
+        showError('No order ID specified. Please go back to the order list and select an order.');
+        return;
+    }
+
+    // Set order ID in the header
+    document.getElementById('orderIdDisplay').textContent = orderId;
+
+    // Fetch order details
+    fetchOrderDetails(orderId);
+    
+    // Initialize confirmation modal
+    const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+    
+    // Function to handle Approve button click
+    function handleApproveClick() {
+        document.getElementById('confirmationTitle').textContent = 'Approve Order';
+        document.getElementById('confirmationMessage').textContent = 'Are you sure you want to approve this order?';
+        document.getElementById('confirmAction').className = 'btn btn-success';
+        document.getElementById('confirmAction').onclick = function() {
+            updateOrderStatus(orderId, 'approved');
+            confirmationModal.hide();
+        };
+        confirmationModal.show();
+    }
+
+    // Function to handle Reject button click
+    function handleRejectClick() {
+        document.getElementById('confirmationTitle').textContent = 'Reject Order';
+        document.getElementById('confirmationMessage').textContent = 'Are you sure you want to reject this order?';
+        document.getElementById('confirmAction').className = 'btn btn-danger';
+        document.getElementById('confirmAction').onclick = function() {
+            updateOrderStatus(orderId, 'rejected');
+            confirmationModal.hide();
+        };
+        confirmationModal.show();
+    }
+
+    // Make these functions accessible in the global scope
+    window.handleApproveClick = handleApproveClick;
+    window.handleRejectClick = handleRejectClick;
+});
+
+function fetchOrderDetails(orderId) {
+    fetch(`view_detail.php?action=getOrderDetail&id=${orderId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'success' && data.order) {
+                displayOrderDetails(data.order);
+            } else {
+                showError(data.message || 'Could not retrieve order details');
+            }
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+            showError(`Error loading order: ${error.message}`);
+        });
+}
+
+function updateOrderStatus(orderId, status) {
+    fetch(`view_detail.php?action=updateOrderStatus&id=${orderId}&status=${status}`, {
+        method: 'POST'
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'success') {
+                // Refresh the order details to show the updated status
+                fetchOrderDetails(orderId);
+            } else {
+                showError(data.message || 'Could not update order status');
+            }
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+            showError(`Error updating order: ${error.message}`);
+        });
+}
+
+function displayOrderDetails(order) {
+    // Hide loading indicator and show details
+    document.getElementById('orderLoading').style.display = 'none';
+    document.getElementById('orderDetails').style.display = 'block';
+
+    // Set status badge
+    const statusBadge = document.getElementById('statusBadge');
+    statusBadge.textContent = order.status || 'Pending';
+    statusBadge.className = `badge ${getStatusClass(order.status)}`;
+
+    // Map order fields to HTML elements with appropriate formatters
+    const fieldMappings = {
+        'dateRequested': formatDate,
+        'requestedBy': defaultFormat,
+        'requestorEmail': defaultFormat,
+        'employeeID': defaultFormat,
+        'shipToPerson': defaultFormat,
+        'account': defaultFormat,
+        'budgetLine': defaultFormat,
+        'shippingWait': defaultFormat,
+        'vendor': defaultFormat,
+        'vendorName': defaultFormat,
+        'vendorAddress': defaultFormat,
+        'vendorPhone': defaultFormat,
+        'websiteLink': formatWebsite,
+        'description': defaultFormat,
+        'catalogNumber': defaultFormat,
+        'size': defaultFormat,
+        'quantity': defaultFormat,
+        'amountNeeded': defaultFormat,
+        'price': formatPrice,
+        'hazards': formatHazards,
+        'pListedWaste': formatYesNo,
+        'storageRoom': defaultFormat,
+        'labStorage': defaultFormat,
+        'requestorSignature': formatSignature,
+        'deptChairSignature': formatSignature,
+        'deptChairDate': formatDate
+    };
+
+    // Populate all fields
+    Object.keys(fieldMappings).forEach(field => {
+        const element = document.getElementById(field);
+        if (element) {
+            const formatter = fieldMappings[field];
+            element.innerHTML = formatter(order[field]);
+        }
+    });
+
+    // Update action buttons based on order status
+    const actionButtons = document.getElementById('actionButtons');
+    
+    // Convert status to lowercase for case-insensitive comparison
+    const status = (order.status || '').toLowerCase();
+    
+    if (status === 'approved' || status === 'rejected') {
+        // If order is already approved or rejected, show status message instead of buttons
+        const statusText = status.charAt(0).toUpperCase() + status.slice(1);
+        actionButtons.innerHTML = `
+            <div class="alert alert-info">
+                <strong>Order is already ${statusText}</strong>
+            </div>
+        `;
+    } else {
+        // Otherwise, show the action buttons
+        actionButtons.innerHTML = `
+            <button type="button" class="btn btn-success" id="approveBtn" onclick="handleApproveClick()">Approve Order</button>
+            <button type="button" class="btn btn-danger ms-2" id="rejectBtn" onclick="handleRejectClick()">Reject Order</button>
+        `;
+    }
+}
+
+// Formatting functions
+function defaultFormat(value) {
+    return value || 'N/A';
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return 'N/A';
+    try {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    } catch (e) {
+        return dateStr || 'N/A';
+    }
+}
+
+function formatPrice(price) {
+    if (!price) return 'N/A';
+    return `$${parseFloat(price).toFixed(2)}`;
+}
+
+function formatYesNo(value) {
+    if (value === null || value === undefined) return 'N/A';
+    return value === '1' || value === 'true' || value === true ? 'Yes' : 'No';
+}
+
+function formatHazards(hazards) {
+    if (!hazards) return 'None specified';
+    
+    // Split hazards by commas or semicolons
+    const hazardArray = hazards.split(/[,;]/).map(h => h.trim()).filter(h => h);
+    
+    if (hazardArray.length === 0) return 'None specified';
+    
+    return hazardArray.map(hazard => 
+        `<span class="badge bg-warning text-dark hazard-tag">${hazard}</span>`
+    ).join(' ');
+}
+
+function formatSignature(signature) {
+    if (!signature) return 'Not signed';
+    return signature === '1' ? 'Signed' : signature;
+}
+
+function formatWebsite(url) {
+    if (!url) return 'N/A';
+    
+    // Set href attribute for website link
+    const linkElement = document.getElementById('websiteLink');
+    if (linkElement) {
+        if (url.startsWith('http')) {
+            linkElement.href = url;
+        } else {
+            linkElement.href = 'https://' + url;
+        }
+        
+        // Display a shortened version
+        let displayUrl = url.replace(/^https?:\/\//i, '');
+        if (displayUrl.length > 30) {
+            displayUrl = displayUrl.substring(0, 30) + '...';
+        }
+        
+        return displayUrl;
+    }
+    return url;
+}
+
+function getStatusClass(status) {
+    switch(String(status || '').toLowerCase()) {
+        case 'approved': return 'bg-success status-badge';
+        case 'rejected': return 'bg-danger status-badge';
+        case 'pending': return 'bg-warning text-dark status-badge';
+        default: return 'bg-secondary status-badge';
+    }
+}
+
+function showError(message) {
+    document.getElementById('orderLoading').style.display = 'none';
+    const errorEl = document.getElementById('errorMessage');
+    errorEl.textContent = message;
+    errorEl.style.display = 'block';
+}
+    </script>
+</body>
+</html>

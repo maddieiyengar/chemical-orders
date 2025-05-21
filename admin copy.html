@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemical Orders Admin - Juniata College</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding-top: 56px; }
+        footer { background-color: #f5f5f5; padding: 20px 0; }
+        .status-pending { background-color: #fff3cd; }
+        .status-approved { background-color: #d1e7dd; }
+        .status-rejected { background-color: #f8d7da; }
+        .small-text { font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="https://www.juniata.edu">Juniata College</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                <li class="nav-item"><a class="nav-link active" href="admin.php">Admin</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid mt-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h2>Chemical Orders Administration</h2>
+        </div>
+        <div class="col-auto">
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-primary" id="viewAll">All Orders</button>
+                <button type="button" class="btn btn-outline-warning" id="viewPending">Pending</button>
+                <button type="button" class="btn btn-outline-success" id="viewApproved">Approved</button>
+                <button type="button" class="btn btn-outline-danger" id="viewRejected">Rejected</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h3 class="h5 mb-0">Order Management</h3>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date Requested</th>
+                            <th>Requestor</th>
+                            <th>Vendor</th>
+                            <th>Account/Budget</th>
+                            <th>Items</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderTableBody">
+                        <!-- Data will be loaded from admin.php -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Order Details Modal -->
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="orderDetailsModalLabel">Order Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="orderDetailsContent">
+                <!-- Details will be loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <div class="d-flex w-100 justify-content-between">
+                    <div>
+                        <button type="button" class="btn btn-danger" id="rejectOrderBtn">Reject Order</button>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-success" id="approveOrderBtn">Approve Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer mt-auto py-3">
+    <div class="container text-center">
+        <p>&copy; Juniata College <?php echo date("Y"); ?></p>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Load all orders by default
+    loadOrders('all');
+    
+    // Filter buttons
+    $('#viewAll').click(function() { loadOrders('all'); });
+    $('#viewPending').click(function() { loadOrders('pending'); });
+    $('#viewApproved').click(function() { loadOrders('approved'); });
+    $('#viewRejected').click(function() { loadOrders('rejected'); });
+    
+    // Load orders function
+    function loadOrders(status) {
+        $.ajax({
+            url: 'admin.php',
+            type: 'GET',
+            data: { action: 'getOrders', status: status },
+            dataType: 'json',
+            success: function(response) {
+                displayOrders(response);
+                updateActiveButton(status);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error loading orders:", error);
+                alert("Error loading orders. Please try again.");
+            }
+        });
+    }
+    
+    // Update active button
+    function updateActiveButton(status) {
+        $('.btn-group .btn').removeClass('active');
+        switch(status) {
+            case 'pending': $('#viewPending').addClass('active'); break;
+            case 'approved': $('#viewApproved').addClass('active'); break;
+            case 'rejected': $('#viewRejected').addClass('active'); break;
+            default: $('#viewAll').addClass('active');
+        }
+    }
+    
+    // Display orders in the table
+    function displayOrders(orders) {
+        var tbody = $('#orderTableBody');
+        tbody.empty();
+        
+        if (orders.length === 0) {
+            tbody.append('<tr><td colspan="8" class="text-center">No orders found</td></tr>');
+            return;
+        }
+        
+        $.each(orders, function(i, order) {
+            var statusClass = '';
+            var statusText = '';
+            
+            switch(order.status) {
+                case 'pending':
+                    statusClass = 'status-pending';
+                    statusText = 'Pending';
+                    break;
+                case 'approved':
+                    statusClass = 'status-approved';
+                    statusText = 'Approved';
+                    break;
+                case 'rejected':
+                    statusClass = 'status-rejected';
+                    statusText = 'Rejected';
+                    break;
+            }
+            
+            var row = $('<tr>').addClass(statusClass);
+            row.append($('<td>').text(order.orderId));
+            row.append($('<td>').text(order.dateRequested));
+            row.append($('<td>').text(order.requestedBy));
+            row.append($('<td>').text(order.vendor));
+            row.append($('<td>').text(order.account + ' / ' + order.budgetLine));
+            row.append($('<td>').text(order.itemCount));
+            row.append($('<td>').text(statusText));
+            
+            var actionsCell = $('<td>');
+            var viewBtn = $('<button>')
+                .addClass('btn btn-sm btn-primary me-1')
+                .text('View')
+                .attr('data-order-id', order.orderId)
+                .click(function() {
+                    viewOrderDetails(order.orderId);
+                });
+                
+            actionsCell.append(viewBtn);
+            
+            if (order.status === 'pending') {
+                var approveBtn = $('<button>')
+                    .addClass('btn btn-sm btn-success me-1')
+                    .text('Approve')
+                    .attr('data-order-id', order.orderId)
+                    .click(function() {
+                        updateOrderStatus(order.orderId, 'approved');
+                    });
+                    
+                var rejectBtn = $('<button>')
+                    .addClass('btn btn-sm btn-danger')
+                    .text('Reject')
+                    .attr('data-order-id', order.orderId)
+                    .click(function() {
+                        updateOrderStatus(order.orderId, 'rejected');
+                    });
+                    
+                actionsCell.append(approveBtn);
+                actionsCell.append(rejectBtn);
+            }
+            
+            row.append(actionsCell);
+            tbody.append(row);
+        });
+    }
+    
+    // View order details
+    function viewOrderDetails(orderId) {
+        $.ajax({
+            url: 'admin.php',
+            type: 'GET',
+            data: { action: 'getOrderDetails', orderId: orderId },
+            dataType: 'json',
+            success: function(response) {
+                displayOrderDetails(response);
+                var orderModal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+                orderModal.show();
+                
+                // Set up approve/reject buttons
+                $('#approveOrderBtn').data('orderId', orderId);
+                $('#rejectOrderBtn').data('orderId', orderId);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error loading order details:", error);
+                alert("Error loading order details. Please try again.");
+            }
+        });
+    }
+    
+    // Display order details in modal
+    function displayOrderDetails(orderData) {
+        var content = $('#orderDetailsContent');
+        content.empty();
+        
+        // Order header info
+        var headerHtml = '<div class="row mb-4">' +
+                          '<div class="col-md-6">' +
+                            '<h4>Order #' + orderData.master.orderId + '</h4>' +
+                            '<p><strong>Date Requested:</strong> ' + orderData.master.dateRequested + '</p>' +
+                            '<p><strong>Requested By:</strong> ' + orderData.master.requestedBy + '</p>' +
+                            '<p><strong>Account/Budget:</strong> ' + orderData.master.account + ' / ' + orderData.master.budgetLine + '</p>' +
+                          '</div>' +
+                          '<div class="col-md-6">' +
+                            '<h4>Vendor Information</h4>' +
+                            '<p><strong>Vendor:</strong> ' + orderData.master.vendor + '</p>';
+        
+        if (orderData.master.vendor === 'Other') {
+            headerHtml += '<p><strong>Vendor Name:</strong> ' + orderData.master.vendorName + '</p>' +
+                         '<p><strong>Vendor Address:</strong> ' + orderData.master.vendorAddress + '</p>' +
+                         '<p><strong>Vendor Phone:</strong> ' + orderData.master.vendorPhone + '</p>';
+        }
+        
+        headerHtml += '</div></div>';
+        
+        // Chemical items table
+        var itemsHtml = '<h4>Order Items</h4>' +
+                       '<div class="table-responsive">' +
+                       '<table class="table table-striped table-bordered">' +
+                       '<thead>' +
+                       '<tr>' +
+                       '<th>Catalog #</th>' +
+                       '<th>Quantity</th>' +
+                       '<th>Description</th>' +
+                       '<th>Size</th>' +
+                       '<th>Amount Needed</th>' +
+                       '<th>Hazards</th>' +
+                       '<th>Price</th>' +
+                       '<th>Storage</th>' +
+                       '</tr>' +
+                       '</thead>' +
+                       '<tbody>';
+        
+        var totalPrice = 0;
+        
+        $.each(orderData.items, function(i, item) {
+            itemsHtml += '<tr>' +
+                        '<td>' + item.catalogNumber + '</td>' +
+                        '<td>' + item.quantity + '</td>' +
+                        '<td>' + item.description + '</td>' +
+                        '<td>' + item.size + '</td>' +
+                        '<td>' + item.amountNeeded + '</td>' +
+                        '<td>' + item.hazards + '</td>' +
+                        '<td>$' + parseFloat(item.price).toFixed(2) + '</td>' +
+                        '<td>' + item.storageRoom + '</td>' +
+                        '</tr>';
+                        
+            totalPrice += parseFloat(item.price) * parseInt(item.quantity || 1);
+        });
+        
+        itemsHtml += '</tbody>' +
+                    '<tfoot>' +
+                    '<tr>' +
+                    '<td colspan="6" class="text-end"><strong>Total:</strong></td>' +
+                    '<td colspan="2"><strong>$' + totalPrice.toFixed(2) + '</strong></td>' +
+                    '</tr>' +
+                    '</tfoot>' +
+                    '</table>' +
+                    '</div>';
+                    
+        // Additional information
+        var additionalHtml = '<div class="row mt-4">' +
+                            '<div class="col-md-6">' +
+                            '<h4>Additional Information</h4>' +
+                            '<p><strong>Lab Storage:</strong> ' + orderData.master.labStorage + '</p>' +
+                            '<p><strong>Ship To Person:</strong> ' + orderData.master.shipToPerson + '</p>' +
+                            '<p><strong>Shipping Wait:</strong> ' + orderData.master.shippingWait + '</p>' +
+                            '<p><strong>P-Listed Waste:</strong> ' + orderData.master.pListedWaste + '</p>' +
+                            '</div>' +
+                            '<div class="col-md-6">' +
+                            '<h4>Approval Status</h4>' +
+                            '<p><strong>Status:</strong> <span class="badge ' + (orderData.master.status === 'approved' ? 'bg-success' : (orderData.master.status === 'rejected' ? 'bg-danger' : 'bg-warning')) + '">' + 
+                            (orderData.master.status === 'approved' ? 'Approved' : (orderData.master.status === 'rejected' ? 'Rejected' : 'Pending')) + '</span></p>';
+                            
+        if (orderData.master.status !== 'pending') {
+            additionalHtml += '<p><strong>Processed By:</strong> ' + orderData.master.processedBy + '</p>' +
+                             '<p><strong>Processed Date:</strong> ' + orderData.master.processedDate + '</p>';
+        }
+        
+        additionalHtml += '</div></div>';
+        
+        content.append(headerHtml + itemsHtml + additionalHtml);
+        
+        // Update modal title
+        $('#orderDetailsModalLabel').text('Order Details - #' + orderData.master.orderId);
+        
+        // Show/hide approve/reject buttons based on status
+        if (orderData.master.status === 'pending') {
+            $('#approveOrderBtn, #rejectOrderBtn').show();
+        } else {
+            $('#approveOrderBtn, #rejectOrderBtn').hide();
+        }
+    }
+    
+    // Approve or reject order
+    $('#approveOrderBtn').click(function() {
+        updateOrderStatus($(this).data('orderId'), 'approved');
+    });
+    
+    $('#rejectOrderBtn').click(function() {
+        updateOrderStatus($(this).data('orderId'), 'rejected');
+    });
+    
+    function updateOrderStatus(orderId, status) {
+        if (confirm("Are you sure you want to " + status + " this order?")) {
+            $.ajax({
+                url: 'admin.php',
+                type: 'POST',
+                data: { 
+                    action: 'updateStatus', 
+                    orderId: orderId, 
+                    status: status 
+                },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        alert("Order has been " + status + " successfully.");
+                        // Close modal if open
+                        var orderModal = bootstrap.Modal.getInstance(document.getElementById('orderDetailsModal'));
+                        if (orderModal) {
+                            orderModal.hide();
+                        }
+                        // Reload current orders
+                        var currentStatus = $('.btn-group .active').attr('id');
+                        if (currentStatus === 'viewAll') {
+                            loadOrders('all');
+                        } else if (currentStatus === 'viewPending') {
+                            loadOrders('pending');
+                        } else if (currentStatus === 'viewApproved') {
+                            loadOrders('approved');
+                        } else if (currentStatus === 'viewRejected') {
+                            loadOrders('rejected');
+                        }
+                    } else {
+                        alert("Error: " + response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error updating order status:", error);
+                    alert("Error updating order status. Please try again.");
+                }
+            });
+        }
+    }
+});
+</script>
+
+</body>
+</html>
